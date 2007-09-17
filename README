@@ -61,11 +61,17 @@ for full documentation.
 
 A brief description of the directory tree:
 
-	doc/          the HTML documentation
-	include/      public include files for libFLAC and libFLAC++
-	man/          the man page for `flac'
-	src/          the source code and private headers
-	test/         the test scripts
+	doc/       the HTML documentation
+	examples/  example programs demonstrating the use of libFLAC and libFLAC++
+	include/   public include files for libFLAC and libFLAC++
+	man/       the man pages for `flac' and `metaflac'
+	src/       the source code and private headers
+	test/      the test scripts
+
+If you have questions about building FLAC that this document does not answer,
+please submit them at the following tracker so this document can be improved:
+
+	http://sourceforge.net/tracker/?group_id=13478&atid=213478
 
 
 ===============================================================================
