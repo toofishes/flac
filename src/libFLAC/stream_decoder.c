@@ -1460,6 +1460,7 @@ FLAC__bool read_metadata_(FLAC__StreamDecoder *decoder)
 		unsigned real_length = length;
 		FLAC__StreamMetadata block;
 
+		memset(&block, 0, sizeof(block));
 		block.is_last = is_last;
 		block.type = (FLAC__MetadataType)type;
 		block.length = length;
