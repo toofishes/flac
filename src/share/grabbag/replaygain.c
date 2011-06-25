@@ -123,11 +123,22 @@ FLAC__bool grabbag__replaygain_is_valid_sample_frequency(unsigned sample_frequen
 		11025,
 		12000,
 		16000,
+		18900,
 		22050,
 		24000,
 		32000,
+		37800,
 		44100,
-		48000
+		48000,
+		56000,
+		64000,
+		88200,
+		96000,
+		112000,
+		128000,
+		144000,
+		176400,
+		192000
 	};
 	static const unsigned n_valid_sample_rates = sizeof(valid_sample_rates) / sizeof(valid_sample_rates[0]);
 
