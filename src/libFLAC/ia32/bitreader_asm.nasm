@@ -565,5 +565,5 @@ cident FLAC__bitreader_read_rice_signed_block_asm_ia32_bswap
 end
 
 %ifdef OBJ_FORMAT_elf
-	section .note.GNU-stack noalloc
+	section .note.GNU-stack progbits noalloc noexec nowrite align=1
 %endif

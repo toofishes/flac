@@ -1507,5 +1507,5 @@ cident FLAC__lpc_restore_signal_asm_ia32_mmx
 end
 
 %ifdef OBJ_FORMAT_elf
-       section .note.GNU-stack noalloc
+       section .note.GNU-stack progbits noalloc noexec nowrite align=1
 %endif
