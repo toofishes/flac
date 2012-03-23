@@ -8,9 +8,6 @@
 # if any packages FLAC relies on (autotools, libogg, libiconv) are
 # installed in non-standard places.
 #
-# If you don't have XMMS installed at all, you should comment out
-# AM_PATH_XMMS in configure.in.
-#
 # FLAC uses iconv but not gettext.  iconv requires config.rpath which
 # is supplied by gettext, which is copied in by gettextize.  But we
 # can't run gettextize since we do not fulfill all it's requirements

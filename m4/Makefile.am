@@ -16,5 +16,4 @@
 #  distribution.
 
 EXTRA_DIST = \
-	ogg.m4 \
-	xmms.m4
+	ogg.m4

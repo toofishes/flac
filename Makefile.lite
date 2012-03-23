@@ -30,7 +30,7 @@
 
 topdir = .
 
-.PHONY: all doc src examples libFLAC libFLAC++ share plugin_common plugin_xmms flac metaflac test_grabbag test_libFLAC test_libFLAC++ test_seeking test_streams
+.PHONY: all doc src examples libFLAC libFLAC++ share flac metaflac test_grabbag test_libFLAC test_libFLAC++ test_seeking test_streams
 all: doc src examples
 
 DEFAULT_CONFIG = release
@@ -67,12 +67,6 @@ flac: libFLAC share
 	(cd src/$@ && $(MAKE) -f Makefile.lite $(CONFIG))
 
 metaflac: libFLAC share
-	(cd src/$@ && $(MAKE) -f Makefile.lite $(CONFIG))
-
-plugin_common: libFLAC
-	(cd src/$@ && $(MAKE) -f Makefile.lite $(CONFIG))
-
-plugin_xmms: libFLAC plugin_common
 	(cd src/$@ && $(MAKE) -f Makefile.lite $(CONFIG))
 
 test_seeking: libFLAC
