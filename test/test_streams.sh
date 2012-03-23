@@ -187,7 +187,7 @@ done
 
 echo "Testing blocksize variations..."
 for disable in '' '--disable-verbatim-subframes --disable-constant-subframes' '--disable-verbatim-subframes --disable-constant-subframes --disable-fixed-subframes' ; do
-	for blocksize in 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 ; do
+	for blocksize in 16 17 18 22 23 24 25 31 32 33 ; do
 		for lpc_order in 0 1 2 3 4 5 7 8 9 15 16 17 31 32 ; do
 			if [ $lpc_order = 0 ] || [ $lpc_order -le $blocksize ] ; then
 				test_file noise8m32 1 8 "-8 -p -e -l $lpc_order --lax --blocksize=$blocksize $disable"
@@ -210,7 +210,7 @@ echo "Testing option variations..."
 for f in 00 01 02 03 04 ; do
 	for disable in '' '--disable-verbatim-subframes --disable-constant-subframes' '--disable-verbatim-subframes --disable-constant-subframes --disable-fixed-subframes' ; do
 		if [ -z "$disable" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
-			for opt in 0 1 2 4 5 6 8 ; do
+			for opt in 0 2 5 6 8 ; do
 				for extras in '' '-p' '-e' ; do
 					if [ -z "$extras" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
 						test_file sine16-$f 1 16 "-$opt $extras $disable"
@@ -227,7 +227,7 @@ done
 for f in 10 11 12 13 14 15 16 17 18 19 ; do
 	for disable in '' '--disable-verbatim-subframes --disable-constant-subframes' '--disable-verbatim-subframes --disable-constant-subframes --disable-fixed-subframes' ; do
 		if [ -z "$disable" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
-			for opt in 0 1 2 4 5 6 8 ; do
+			for opt in 0 2 5 6 8 ; do
 				for extras in '' '-p' '-e' ; do
 					if [ -z "$extras" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
 						test_file sine16-$f 2 16 "-$opt $extras $disable"
@@ -243,11 +243,11 @@ done
 
 echo "Testing noise..."
 for disable in '' '--disable-verbatim-subframes --disable-constant-subframes' '--disable-verbatim-subframes --disable-constant-subframes --disable-fixed-subframes' ; do
-	if [ -z "$disable" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
-		for channels in 1 2 4 8 ; do
+	if [ -z "$disable" ] || [ "$FLAC__TEST_LEVEL" -gt 1 ] ; then
+		for channels in 1 2 8 ; do
 			if [ $channels -le 2 ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
 				for bps in 8 16 24 ; do
-					for opt in 0 1 2 3 4 5 6 7 8 ; do
+					for opt in 0 5 8 ; do
 						for extras in '' '-p' '-e' ; do
 							if [ -z "$extras" ] || [ "$FLAC__TEST_LEVEL" -gt 0 ] ; then
 								for blocksize in '' '--lax -b 32' '--lax -b 32768' '--lax -b 65535' ; do
