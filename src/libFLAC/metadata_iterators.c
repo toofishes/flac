@@ -1413,11 +1413,13 @@ static FLAC__bool chain_rewrite_file_(FLAC__Metadata_Chain *chain, const char *t
 	if(!open_tempfile_(chain->filename, tempfile_path_prefix, &tempfile, &tempfilename, &status)) {
 		chain->status = get_equivalent_status_(status);
 		cleanup_tempfile_(&tempfile, &tempfilename);
+		fclose(f);
 		return false;
 	}
 	if(!copy_n_bytes_from_file_(f, tempfile, chain->first_offset, &status)) {
 		chain->status = get_equivalent_status_(status);
 		cleanup_tempfile_(&tempfile, &tempfilename);
+		fclose(f);
 		return false;
 	}
 
@@ -1425,10 +1427,14 @@ static FLAC__bool chain_rewrite_file_(FLAC__Metadata_Chain *chain, const char *t
 	for(node = chain->head; node; node = node->next) {
 		if(!write_metadata_block_header_(tempfile, &status, node->data)) {
 			chain->status = get_equivalent_status_(status);
+			cleanup_tempfile_(&tempfile, &tempfilename);
+			fclose(f);
 			return false;
 		}
 		if(!write_metadata_block_data_(tempfile, &status, node->data)) {
 			chain->status = get_equivalent_status_(status);
+			cleanup_tempfile_(&tempfile, &tempfilename);
+			fclose(f);
 			return false;
 		}
 	}
@@ -1436,13 +1442,15 @@ static FLAC__bool chain_rewrite_file_(FLAC__Metadata_Chain *chain, const char *t
 
 	/* copy the file postfix (everything after the metadata) */
 	if(0 != fseeko(f, chain->last_offset, SEEK_SET)) {
-		cleanup_tempfile_(&tempfile, &tempfilename);
 		chain->status = FLAC__METADATA_CHAIN_STATUS_SEEK_ERROR;
+		cleanup_tempfile_(&tempfile, &tempfilename);
+		fclose(f);
 		return false;
 	}
 	if(!copy_remaining_bytes_from_file_(f, tempfile, &status)) {
-		cleanup_tempfile_(&tempfile, &tempfilename);
 		chain->status = get_equivalent_status_(status);
+		cleanup_tempfile_(&tempfile, &tempfilename);
+		fclose(f);
 		return false;
 	}
 
