@@ -32,6 +32,3 @@ SUBDIRS = \
 	test_streams \
 	utils \
 	$(CPPLIBS_DIRS)
-
-EXTRA_DIST = \
-	Makefile.lite

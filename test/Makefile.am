@@ -33,7 +33,6 @@ TESTS = \
 	./test_streams.sh
 
 EXTRA_DIST = \
-	Makefile.lite \
 	cuesheet.ok \
 	metaflac.flac.in \
 	metaflac.flac.ok \

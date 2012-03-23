@@ -18,5 +18,4 @@
 SUBDIRS = getopt replaygain_analysis replaygain_synthesis grabbag utf8
 
 EXTRA_DIST = \
-	Makefile.lite \
 	README

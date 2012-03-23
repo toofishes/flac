@@ -11,7 +11,6 @@ noinst_LTLIBRARIES = libreplaygain_synthesis.la
 libreplaygain_synthesis_la_SOURCES = replaygain_synthesis.c
 
 EXTRA_DIST = \
-	Makefile.lite \
 	replaygain_synthesis_static.dsp \
 	replaygain_synthesis_static.vcproj
 

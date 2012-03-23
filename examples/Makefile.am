@@ -23,5 +23,4 @@ SUBDIRS = c $(CPPLIBS_DIRS)
 
 EXTRA_DIST = \
 	examples.dsp \
-	Makefile.lite \
 	README

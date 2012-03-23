@@ -16,6 +16,3 @@
 #  distribution.
 
 SUBDIRS = cuesheet picture
-
-EXTRA_DIST = \
-	Makefile.lite

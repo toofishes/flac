@@ -44,7 +44,6 @@ FLAC - 1.2.1 - Contents
 - Prerequisites
 - Note to embedded developers
 - Building in a GNU environment
-- Building with Makefile.lite
 - Building with MSVC
 - Building on Mac OS X
 
@@ -140,8 +139,7 @@ as root because it confuses some of the tests.
 
 NOTE: Despite our best efforts it's entirely possible to have
 problems when using older versions of autoconf, automake, or
-libtool.  If you have the latest versions and still can't get it
-to work, see the next section on Makefile.lite.
+libtool.
 
 There are a few FLAC-specific arguments you can give to
 `configure':
@@ -172,28 +170,6 @@ Use these if you have these packages but configure can't find them.
 If you want to build completely from scratch (i.e. starting with just
 configure.in and Makefile.am) you should be able to just run 'autogen.sh'
 but make sure and read the comments in that file first.
-
-
-===============================================================================
-Building with Makefile.lite
-===============================================================================
-
-There is a more lightweight build system for do-it-yourself-ers.
-It is also useful if configure isn't working, which may be the
-case since lately we've had some problems with different versions
-of automake and libtool.  The Makefile.lite system should work
-on GNU systems with few or no adjustments.
-
-From the top level just 'make -f Makefile.lite'.  You can
-specify zero or one optional target from 'release', 'debug',
-'test', or 'clean'.  The default is 'release'.  There is no
-'install' target but everything you need will end up in the
-obj/ directory.
-
-If you are not on an x86 system or you don't have nasm, you
-may have to change the DEFINES in src/libFLAC/Makefile.lite.  If
-you don't have nasm, remove -DFLAC__HAS_NASM.  If your target is
-not an x86, change -DFLAC__CPU_IA32 to -DFLAC__CPU_UNKNOWN.
 
 
 ===============================================================================

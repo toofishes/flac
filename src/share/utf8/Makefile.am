@@ -9,7 +9,6 @@ noinst_LTLIBRARIES = libutf8.la
 libutf8_la_SOURCES = charset.c charset.h iconvert.c utf8.c
 
 EXTRA_DIST = \
-	Makefile.lite \
 	charmaps.h \
 	makemap.c \
 	charset_test.c \

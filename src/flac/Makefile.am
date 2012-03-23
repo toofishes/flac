@@ -20,8 +20,6 @@ bin_PROGRAMS = flac
 AM_CFLAGS = @OGG_CFLAGS@
 
 EXTRA_DIST = \
-	Makefile.lite \
-	Makefile.lite.iffscan \
 	flac.dsp \
 	flac.vcproj \
 	iffscan.c \

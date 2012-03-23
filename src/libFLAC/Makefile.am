@@ -80,7 +80,6 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = flac.pc
 
 EXTRA_DIST = \
-	Makefile.lite \
 	flac.pc.in \
 	libFLAC_dynamic.dsp \
 	libFLAC_dynamic.vcproj \

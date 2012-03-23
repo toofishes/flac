@@ -20,7 +20,6 @@ bin_PROGRAMS = metaflac
 AM_CFLAGS = @OGG_CFLAGS@
 
 EXTRA_DIST = \
-	Makefile.lite \
 	metaflac.dsp \
 	metaflac.vcproj
 
