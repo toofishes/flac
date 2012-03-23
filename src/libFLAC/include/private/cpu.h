@@ -48,14 +48,8 @@ typedef struct {
 	FLAC__bool cpuid;
 	FLAC__bool cmov;
 	FLAC__bool mmx;
-	FLAC__bool fxsr;
 	FLAC__bool sse;
-	FLAC__bool sse2;
-	FLAC__bool sse3;
-	FLAC__bool ssse3;
 	FLAC__bool _3dnow;
-	FLAC__bool ext3dnow;
-	FLAC__bool extmmx;
 } FLAC__CPUInfo_IA32;
 
 typedef struct {

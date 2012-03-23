@@ -89,16 +89,9 @@ static void sigill_handler (int sig)
 /* these are flags in EDX of CPUID AX=00000001 */
 static const unsigned FLAC__CPUINFO_IA32_CPUID_CMOV = 0x00008000;
 static const unsigned FLAC__CPUINFO_IA32_CPUID_MMX = 0x00800000;
-static const unsigned FLAC__CPUINFO_IA32_CPUID_FXSR = 0x01000000;
 static const unsigned FLAC__CPUINFO_IA32_CPUID_SSE = 0x02000000;
-static const unsigned FLAC__CPUINFO_IA32_CPUID_SSE2 = 0x04000000;
-/* these are flags in ECX of CPUID AX=00000001 */
-static const unsigned FLAC__CPUINFO_IA32_CPUID_SSE3 = 0x00000001;
-static const unsigned FLAC__CPUINFO_IA32_CPUID_SSSE3 = 0x00000200;
 /* these are flags in EDX of CPUID AX=80000001 */
 static const unsigned FLAC__CPUINFO_IA32_CPUID_EXTENDED_AMD_3DNOW = 0x80000000;
-static const unsigned FLAC__CPUINFO_IA32_CPUID_EXTENDED_AMD_EXT3DNOW = 0x40000000;
-static const unsigned FLAC__CPUINFO_IA32_CPUID_EXTENDED_AMD_EXTMMX = 0x00400000;
 
 
 /*
@@ -164,33 +157,19 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 	info->data.ia32.cpuid = FLAC__cpu_have_cpuid_asm_ia32()? true : false;
 	info->data.ia32.cmov = false;
 	info->data.ia32.mmx = false;
-	info->data.ia32.fxsr = false;
 	info->data.ia32.sse = false;
-	info->data.ia32.sse2 = false;
-	info->data.ia32.sse3 = false;
-	info->data.ia32.ssse3 = false;
 	info->data.ia32._3dnow = false;
-	info->data.ia32.ext3dnow = false;
-	info->data.ia32.extmmx = false;
 	if(info->data.ia32.cpuid) {
 		/* http://www.sandpile.org/ia32/cpuid.htm */
 		FLAC__uint32 flags_edx, flags_ecx;
 		FLAC__cpu_info_asm_ia32(&flags_edx, &flags_ecx);
 		info->data.ia32.cmov  = (flags_edx & FLAC__CPUINFO_IA32_CPUID_CMOV )? true : false;
 		info->data.ia32.mmx   = (flags_edx & FLAC__CPUINFO_IA32_CPUID_MMX  )? true : false;
-		info->data.ia32.fxsr  = (flags_edx & FLAC__CPUINFO_IA32_CPUID_FXSR )? true : false;
 		info->data.ia32.sse   = (flags_edx & FLAC__CPUINFO_IA32_CPUID_SSE  )? true : false;
-		info->data.ia32.sse2  = (flags_edx & FLAC__CPUINFO_IA32_CPUID_SSE2 )? true : false;
-		info->data.ia32.sse3  = (flags_ecx & FLAC__CPUINFO_IA32_CPUID_SSE3 )? true : false;
-		info->data.ia32.ssse3 = (flags_ecx & FLAC__CPUINFO_IA32_CPUID_SSSE3)? true : false;
 
 #ifdef FLAC__USE_3DNOW
 		flags_edx = FLAC__cpu_info_extended_amd_asm_ia32();
 		info->data.ia32._3dnow   = (flags_edx & FLAC__CPUINFO_IA32_CPUID_EXTENDED_AMD_3DNOW   )? true : false;
-		info->data.ia32.ext3dnow = (flags_edx & FLAC__CPUINFO_IA32_CPUID_EXTENDED_AMD_EXT3DNOW)? true : false;
-		info->data.ia32.extmmx   = (flags_edx & FLAC__CPUINFO_IA32_CPUID_EXTENDED_AMD_EXTMMX  )? true : false;
-#else
-		info->data.ia32._3dnow = info->data.ia32.ext3dnow = info->data.ia32.extmmx = false;
 #endif
 
 #ifdef DEBUG
@@ -198,23 +177,17 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 		fprintf(stderr, "  CPUID ...... %c\n", info->data.ia32.cpuid   ? 'Y' : 'n');
 		fprintf(stderr, "  CMOV ....... %c\n", info->data.ia32.cmov    ? 'Y' : 'n');
 		fprintf(stderr, "  MMX ........ %c\n", info->data.ia32.mmx     ? 'Y' : 'n');
-		fprintf(stderr, "  FXSR ....... %c\n", info->data.ia32.fxsr    ? 'Y' : 'n');
 		fprintf(stderr, "  SSE ........ %c\n", info->data.ia32.sse     ? 'Y' : 'n');
-		fprintf(stderr, "  SSE2 ....... %c\n", info->data.ia32.sse2    ? 'Y' : 'n');
-		fprintf(stderr, "  SSE3 ....... %c\n", info->data.ia32.sse3    ? 'Y' : 'n');
-		fprintf(stderr, "  SSSE3 ...... %c\n", info->data.ia32.ssse3   ? 'Y' : 'n');
 		fprintf(stderr, "  3DNow! ..... %c\n", info->data.ia32._3dnow  ? 'Y' : 'n');
-		fprintf(stderr, "  3DNow!-ext . %c\n", info->data.ia32.ext3dnow? 'Y' : 'n');
-		fprintf(stderr, "  3DNow!-MMX . %c\n", info->data.ia32.extmmx  ? 'Y' : 'n');
 #endif
 
 		/*
-		 * now have to check for OS support of SSE/SSE2
+		 * now have to check for OS support of SSE
 		 */
-		if(info->data.ia32.fxsr || info->data.ia32.sse || info->data.ia32.sse2) {
+		if(info->data.ia32.sse) {
 #if defined FLAC__NO_SSE_OS
 			/* assume user knows better than us; turn it off */
-			info->data.ia32.fxsr = info->data.ia32.sse = info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
+			info->data.ia32.sse = false;
 #elif defined FLAC__SSE_OS
 			/* assume user knows better than us; leave as detected above */
 #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__) || defined(__APPLE__)
@@ -224,21 +197,13 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 			len = sizeof(sse); sse = sse || (sysctlbyname("hw.instruction_sse", &sse, &len, NULL, 0) == 0 && sse);
 			len = sizeof(sse); sse = sse || (sysctlbyname("hw.optional.sse"   , &sse, &len, NULL, 0) == 0 && sse); /* __APPLE__ ? */
 			if(!sse)
-				info->data.ia32.fxsr = info->data.ia32.sse = info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
+				info->data.ia32.sse = false;
 #elif defined(__NetBSD__) || defined (__OpenBSD__)
 # if __NetBSD_Version__ >= 105250000 || (defined __OpenBSD__)
 			int val = 0, mib[2] = { CTL_MACHDEP, CPU_SSE };
 			size_t len = sizeof(val);
 			if(sysctl(mib, 2, &val, &len, NULL, 0) < 0 || !val)
-				info->data.ia32.fxsr = info->data.ia32.sse = info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
-			else { /* double-check SSE2 */
-				mib[1] = CPU_SSE2;
-				len = sizeof(val);
-				if(sysctl(mib, 2, &val, &len, NULL, 0) < 0 || !val)
-					info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
-			}
-# else
-			info->data.ia32.fxsr = info->data.ia32.sse = info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
+				info->data.ia32.sse = false;
 # endif
 #elif defined(__linux__)
 			int sse = 0;
@@ -275,9 +240,6 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 
 				sigaction(SIGILL, &sigill_save, NULL);
 			}
-
-			if(!sse)
-				info->data.ia32.fxsr = info->data.ia32.sse = info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
 #elif defined(_MSC_VER)
 # ifdef USE_TRY_CATCH_FLAVOR
 			_try {
@@ -294,7 +256,7 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 			}
 			_except(EXCEPTION_EXECUTE_HANDLER) {
 				if (_exception_code() == STATUS_ILLEGAL_INSTRUCTION)
-					info->data.ia32.fxsr = info->data.ia32.sse = info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
+					info->data.ia32.sse = false;
 			}
 # else
 			int sse = 0;
@@ -325,11 +287,11 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 			}
 			SetUnhandledExceptionFilter(save);
 			if(!sse)
-				info->data.ia32.fxsr = info->data.ia32.sse = info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
+				info->data.ia32.sse = false;
 # endif
 #else
 			/* no way to test, disable to be safe */
-			info->data.ia32.fxsr = info->data.ia32.sse = info->data.ia32.sse2 = info->data.ia32.sse3 = info->data.ia32.ssse3 = false;
+			info->data.ia32.sse = false;
 #endif
 #ifdef DEBUG
 		fprintf(stderr, "  SSE OS sup . %c\n", info->data.ia32.sse     ? 'Y' : 'n');
