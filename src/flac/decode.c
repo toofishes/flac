@@ -1306,6 +1306,11 @@ void metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMet
 			decoder_session->abort_flag = true;
 			return;
 		}
+		if (decoder_session->format == FORMAT_RAW && (decoder_session->bps % 8) != 0) {
+			flac__utils_printf(stderr, 1, "%s: ERROR: bits per sample is %u, must be 8/16/24 for raw format output\n", decoder_session->inbasefilename, decoder_session->bps);
+			decoder_session->abort_flag = true;
+			return;
+		}
 	}
 	else if(metadata->type == FLAC__METADATA_TYPE_CUESHEET) {
 		/* remember, at this point, decoder_session->total_samples can be 0, meaning 'unknown' */
