@@ -1,0 +1,15 @@
+*.raw
+*.cmp
+*.flac
+*.wav
+*.aiff
+*.rf64
+*.w64
+*.oga
+cuetest.cue
+cuesheet.diff
+cuesheet.log
+picture.diff
+picture.log
+out.meta
+streams.log
