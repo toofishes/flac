@@ -305,7 +305,7 @@ else
 		CPPFLAGS="-DFLaC__INLINE=$ac_cv_c_inline $CPPFLAGS"
 	fi
 	if test "x$GCC" = xyes; then
-		CFLAGS="-O3 -funroll-loops -finline-functions -Wall -W -Winline $CFLAGS"
+		CFLAGS="-Wall -W -Winline $CFLAGS"
 	fi
 fi
 
