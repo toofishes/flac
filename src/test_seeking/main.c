@@ -205,7 +205,6 @@ static FLAC__StreamDecoderWriteStatus write_callback_(const FLAC__StreamDecoder 
 #else
 		printf("frame@%llu(%u)... ", (unsigned long long)frame->header.number.sample_number, frame->header.blocksize);
 #endif
-	fflush(stdout);
 
 	/* check against PCM data if we have it */
 	if (dcd->pcm) {
@@ -275,7 +274,7 @@ static FLAC__bool seek_barrage(FLAC__bool is_ogg, const char *filename, off_t fi
 	decoder_client_data.pcm = pcm;
 	decoder_client_data.got_data = false;
 	decoder_client_data.total_samples = 0;
-	decoder_client_data.quiet = false;
+	decoder_client_data.quiet = true;
 	decoder_client_data.ignore_errors = false;
 	decoder_client_data.error_occurred = false;
 
@@ -299,10 +298,8 @@ static FLAC__bool seek_barrage(FLAC__bool is_ogg, const char *filename, off_t fi
 
 	if(!is_ogg) { /* not necessary to do this for Ogg because of its seeking method */
 	/* process until end of stream to make sure we can still seek in that state */
-		decoder_client_data.quiet = true;
 		if(!FLAC__stream_decoder_process_until_end_of_stream(decoder))
 			return die_s_("FLAC__stream_decoder_process_until_end_of_stream() FAILED", decoder);
-		decoder_client_data.quiet = false;
 
 		printf("stream decoder state is %s\n", FLAC__stream_decoder_get_resolved_state_string(decoder));
 		if(FLAC__stream_decoder_get_state(decoder) != FLAC__STREAM_DECODER_END_OF_STREAM)
@@ -347,44 +344,44 @@ static FLAC__bool seek_barrage(FLAC__bool is_ogg, const char *filename, off_t fi
 			pos = (FLAC__uint64)(local_rand_() % n);
 		}
 
+		if (!decoder_client_data.quiet)
 #ifdef _MSC_VER
-		printf("#%u:seek(%I64u)... ", i, pos);
+			printf("#%u:seek(%I64u)... ", i, pos);
 #else
-		printf("#%u:seek(%llu)... ", i, (unsigned long long)pos);
+			printf("#%u:seek(%llu)... ", i, (unsigned long long)pos);
 #endif
-		fflush(stdout);
 		if(!FLAC__stream_decoder_seek_absolute(decoder, pos)) {
-			if(pos >= (FLAC__uint64)n)
-				printf("seek past end failed as expected... ");
-			else if(decoder_client_data.total_samples == 0 && total_samples <= 0)
-				printf("seek failed, assuming it was past EOF... ");
-			else
+			if(pos >= (FLAC__uint64)n) {
+				if (!decoder_client_data.quiet)
+					printf("seek past end failed as expected... ");
+			} else if(decoder_client_data.total_samples == 0 && total_samples <= 0) {
+				if (!decoder_client_data.quiet)
+					printf("seek failed, assuming it was past EOF... ");
+			} else
 				return die_s_("FLAC__stream_decoder_seek_absolute() FAILED", decoder);
 			if(!FLAC__stream_decoder_flush(decoder))
 				return die_s_("FLAC__stream_decoder_flush() FAILED", decoder);
 		}
 		else if(read_mode == 1) {
-			printf("decode_frame... ");
-			fflush(stdout);
+			if (!decoder_client_data.quiet)
+				printf("decode_frame... ");
 			if(!FLAC__stream_decoder_process_single(decoder))
 				return die_s_("FLAC__stream_decoder_process_single() FAILED", decoder);
 
-			printf("decode_frame... ");
-			fflush(stdout);
+			if (!decoder_client_data.quiet)
+				printf("decode_frame... ");
 			if(!FLAC__stream_decoder_process_single(decoder))
 				return die_s_("FLAC__stream_decoder_process_single() FAILED", decoder);
 		}
 		else if(read_mode == 2) {
-			printf("decode_all... ");
-			fflush(stdout);
-			decoder_client_data.quiet = true;
+			if (!decoder_client_data.quiet)
+				printf("decode_all... ");
 			if(!FLAC__stream_decoder_process_until_end_of_stream(decoder))
 				return die_s_("FLAC__stream_decoder_process_until_end_of_stream() FAILED", decoder);
-			decoder_client_data.quiet = false;
 		}
 
-		printf("OK\n");
-		fflush(stdout);
+		if (!decoder_client_data.quiet)
+			printf("OK\n");
 	}
 	stop_signal_ = false;
 
