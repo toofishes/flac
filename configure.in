@@ -372,7 +372,6 @@ AC_CONFIG_FILES([ \
 	doc/html/Makefile \
 	doc/html/images/Makefile \
 	doc/html/images/hw/Makefile \
-	doc/html/ru/Makefile \
 	m4/Makefile \
 	man/Makefile \
 	test/Makefile \

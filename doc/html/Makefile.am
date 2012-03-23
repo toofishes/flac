@@ -17,7 +17,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = ru images
+SUBDIRS = images
 
 docdir = $(datadir)/doc/$(PACKAGE)-$(VERSION)/html
 
