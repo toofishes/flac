@@ -162,7 +162,6 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 #if !defined FLAC__NO_ASM && defined FLAC__HAS_NASM
 	info->use_asm = true; /* we assume a minimum of 80386 with FLAC__CPU_IA32 */
 	info->data.ia32.cpuid = FLAC__cpu_have_cpuid_asm_ia32()? true : false;
-	info->data.ia32.bswap = info->data.ia32.cpuid; /* CPUID => BSWAP since it came after */
 	info->data.ia32.cmov = false;
 	info->data.ia32.mmx = false;
 	info->data.ia32.fxsr = false;
@@ -197,7 +196,6 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 #ifdef DEBUG
 		fprintf(stderr, "CPU info (IA-32):\n");
 		fprintf(stderr, "  CPUID ...... %c\n", info->data.ia32.cpuid   ? 'Y' : 'n');
-		fprintf(stderr, "  BSWAP ...... %c\n", info->data.ia32.bswap   ? 'Y' : 'n');
 		fprintf(stderr, "  CMOV ....... %c\n", info->data.ia32.cmov    ? 'Y' : 'n');
 		fprintf(stderr, "  MMX ........ %c\n", info->data.ia32.mmx     ? 'Y' : 'n');
 		fprintf(stderr, "  FXSR ....... %c\n", info->data.ia32.fxsr    ? 'Y' : 'n');

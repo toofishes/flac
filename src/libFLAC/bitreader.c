@@ -65,7 +65,7 @@ typedef FLAC__uint32 brword;
 #define SWAP_BE_WORD_TO_HOST(x) (x)
 #else
 #ifdef _MSC_VER
-#define SWAP_BE_WORD_TO_HOST(x) local_swap32_(x)
+#define SWAP_BE_WORD_TO_HOST(x) _byteswap_ulong(x)
 #else
 #define SWAP_BE_WORD_TO_HOST(x) ntohl(x)
 #endif
@@ -151,36 +151,6 @@ struct FLAC__BitReader {
 	void *client_data;
 	FLAC__CPUInfo cpu_info;
 };
-
-#ifdef _MSC_VER
-/* OPT: an MSVC built-in would be better */
-/* OPT: use _byteswap_ulong intrinsic? */
-static _inline FLAC__uint32 local_swap32_(FLAC__uint32 x)
-{
-	x = ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
-	return (x>>16) | (x<<16);
-}
-#ifdef _WIN64
-#else
-static void local_swap32_block_(FLAC__uint32 *start, FLAC__uint32 len)
-{
-	__asm {
-		mov edx, start
-		mov ecx, len
-		test ecx, ecx
-loop1:
-		jz done1
-		mov eax, [edx]
-		bswap eax
-		mov [edx], eax
-		add edx, 4
-		dec ecx
-		jmp short loop1
-done1:
-	}
-}
-#endif
-#endif
 
 static FLaC__INLINE void crc16_update_word_(FLAC__BitReader *br, brword word)
 {
@@ -270,13 +240,6 @@ FLAC__bool bitreader_read_from_client_(FLAC__BitReader *br)
 #if WORDS_BIGENDIAN
 #else
 	end = (br->words*FLAC__BYTES_PER_WORD + br->bytes + bytes + (FLAC__BYTES_PER_WORD-1)) / FLAC__BYTES_PER_WORD;
-# if defined(_MSC_VER) && !defined(_WIN64) && (FLAC__BYTES_PER_WORD == 4)
-	if(br->cpu_info.type == FLAC__CPUINFO_TYPE_IA32 && br->cpu_info.data.ia32.bswap) {
-		start = br->words;
-		local_swap32_block_(br->buffer + start, end - start);
-	}
-	else
-# endif
 	for(start = br->words; start < end; start++)
 		br->buffer[start] = SWAP_BE_WORD_TO_HOST(br->buffer[start]);
 #endif

@@ -4,9 +4,32 @@
 
 #include <stdlib.h>		/* for malloc() */
 #include <string.h>		/* for memcpy() */
+#ifdef _MSC_VER
+# include <winsock.h> /* for ntohl() */
+# if _MSC_VER >= 1310
+#  include <winsock2.h> /* for ntohl(), sometimes it is not in winsock.h */
+# endif
+#elif defined FLAC__SYS_DARWIN
+# include <machine/endian.h> /* for ntohl() */
+#elif defined __MINGW32__
+# include <winsock.h> /* for ntohl() */
+#else
+# include <netinet/in.h> /* for ntohl() */
+#endif
 
 #include "private/md5.h"
 #include "share/alloc.h"
+
+/* SWAP_BE_WORD_TO_HOST swaps bytes in a brword (which is always big-endian) if necessary to match host byte order */
+#if WORDS_BIGENDIAN
+#define SWAP_BE_WORD_TO_HOST(x) (x)
+#else
+#ifdef _MSC_VER
+#define SWAP_BE_WORD_TO_HOST(x) _byteswap_ulong(x)
+#else
+#define SWAP_BE_WORD_TO_HOST(x) ntohl(x)
+#endif
+#endif
 
 /*
  * This code implements the MD5 message-digest algorithm.
@@ -133,43 +156,6 @@ static void FLAC__MD5Transform(FLAC__uint32 buf[4], FLAC__uint32 const in[16])
 	buf[3] += d;
 }
 
-#if WORDS_BIGENDIAN
-//@@@@@@ OPT: use bswap/intrinsics
-static void byteSwap(FLAC__uint32 *buf, unsigned words)
-{
-	register FLAC__uint32 x;
-	do {
-		x = *buf; 
-		x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff);
-		*buf++ = (x >> 16) | (x << 16);
-	} while (--words);
-}
-static void byteSwapX16(FLAC__uint32 *buf)
-{
-	register FLAC__uint32 x;
-
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf++ = (x >> 16) | (x << 16);
-	x = *buf; x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff); *buf   = (x >> 16) | (x << 16);
-}
-#else
-#define byteSwap(buf, words)
-#define byteSwapX16(buf)
-#endif
-
 /*
  * Update context to reflect the concatenation of another buffer full
  * of bytes.
@@ -177,6 +163,7 @@ static void byteSwapX16(FLAC__uint32 *buf)
 static void FLAC__MD5Update(FLAC__MD5Context *ctx, FLAC__byte const *buf, unsigned len)
 {
 	FLAC__uint32 t;
+	int i;
 
 	/* Update byte count */
 
@@ -191,7 +178,9 @@ static void FLAC__MD5Update(FLAC__MD5Context *ctx, FLAC__byte const *buf, unsign
 	}
 	/* First chunk is an odd size */
 	memcpy((FLAC__byte *)ctx->in + 64 - t, buf, t);
-	byteSwapX16(ctx->in);
+	for (i = 0; i < 16; i++) {
+		ctx->in[i] = SWAP_BE_WORD_TO_HOST(ctx->in[i]);
+	}
 	FLAC__MD5Transform(ctx->buf, ctx->in);
 	buf += t;
 	len -= t;
@@ -199,7 +188,9 @@ static void FLAC__MD5Update(FLAC__MD5Context *ctx, FLAC__byte const *buf, unsign
 	/* Process data in 64-byte chunks */
 	while (len >= 64) {
 		memcpy(ctx->in, buf, 64);
-		byteSwapX16(ctx->in);
+		for (i = 0; i < 16; i++) {
+			ctx->in[i] = SWAP_BE_WORD_TO_HOST(ctx->in[i]);
+		}
 		FLAC__MD5Transform(ctx->buf, ctx->in);
 		buf += 64;
 		len -= 64;
@@ -233,6 +224,7 @@ void FLAC__MD5Init(FLAC__MD5Context *ctx)
  */
 void FLAC__MD5Final(FLAC__byte digest[16], FLAC__MD5Context *ctx)
 {
+	int i;
 	int count = ctx->bytes[0] & 0x3f;	/* Number of bytes in ctx->in */
 	FLAC__byte *p = (FLAC__byte *)ctx->in + count;
 
@@ -244,20 +236,26 @@ void FLAC__MD5Final(FLAC__byte digest[16], FLAC__MD5Context *ctx)
 
 	if (count < 0) {	/* Padding forces an extra block */
 		memset(p, 0, count + 8);
-		byteSwapX16(ctx->in);
+		for (i = 0; i < 16; i++) {
+			ctx->in[i] = SWAP_BE_WORD_TO_HOST(ctx->in[i]);
+		}
 		FLAC__MD5Transform(ctx->buf, ctx->in);
 		p = (FLAC__byte *)ctx->in;
 		count = 56;
 	}
 	memset(p, 0, count);
-	byteSwap(ctx->in, 14);
+	for (i = 0; i < 14; i++) {
+		ctx->in[i] = SWAP_BE_WORD_TO_HOST(ctx->in[i]);
+	}
 
 	/* Append length in bits and transform */
 	ctx->in[14] = ctx->bytes[0] << 3;
 	ctx->in[15] = ctx->bytes[1] << 3 | ctx->bytes[0] >> 29;
 	FLAC__MD5Transform(ctx->buf, ctx->in);
 
-	byteSwap(ctx->buf, 4);
+	for (i = 0; i < 4; i++) {
+		ctx->in[i] = SWAP_BE_WORD_TO_HOST(ctx->in[i]);
+	}
 	memcpy(digest, ctx->buf, 16);
 	memset(ctx, 0, sizeof(ctx));	/* In case it's sensitive */
 	if(0 != ctx->internal_buf) {

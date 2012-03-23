@@ -46,7 +46,6 @@ typedef enum {
 
 typedef struct {
 	FLAC__bool cpuid;
-	FLAC__bool bswap;
 	FLAC__bool cmov;
 	FLAC__bool mmx;
 	FLAC__bool fxsr;
